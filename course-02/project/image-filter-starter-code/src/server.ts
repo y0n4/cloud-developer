@@ -29,6 +29,24 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   /**************************************************************************** */
 
+  // > try it {{host}}/filteredimage?image_url=url_here
+  app.get("/filteredimage", (req, res) => {
+    const { image_url } = req.query;
+    if (image_url) {
+      const validImg = new RegExp('^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$');
+      if (validImg.test(image_url)) {
+        filterImageFromURL(image_url)
+          .then(data => {
+            console.log('DATA', data);
+            res.sendFile(data);
+          });
+      } else res.status(404).send('invalid image_url')
+    } else return res.status(400).send('image_url is required');
+  });
+
+  // app.get( "/filteredimage?image_url={{URL}}", ( req, res ) => {
+  //     console.log('hey');
+  // } );
   //! END @TODO1
   
   // Root Endpoint
@@ -40,7 +58,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   // Start the Server
   app.listen( port, () => {
-      console.log( `server running http://localhost:${ port }` );
+      console.log( `🌸 server running http://localhost:${ port } 🌸` );
       console.log( `press CTRL+C to stop server` );
   } );
 })();
