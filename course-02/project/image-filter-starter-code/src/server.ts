@@ -37,17 +37,14 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
       if (validImg.test(image_url)) {
         filterImageFromURL(image_url)
           .then(data => {
-            console.log('DATA', data);
+            // console.log('💜', data);
+            res.on('finish', () => deleteLocalFiles([data]));
             res.sendFile(data);
           });
-      } else res.status(404).send('invalid image_url')
-    } else return res.status(400).send('image_url is required');
+      } else res.status(404).send('invalid image_url');
+    } else return res.status(422).send('image_url is required');
   });
-
-  // app.get( "/filteredimage?image_url={{URL}}", ( req, res ) => {
-  //     console.log('hey');
-  // } );
-  //! END @TODO1
+  // ! END @TODO1
   
   // Root Endpoint
   // Displays a simple message to the user
