@@ -17,12 +17,12 @@ exports.handler = async (event) => {
   const startTime = timeInMs()
   await axios.get(url)
 
-  // Example of how to write a single data point
+  // Example of how to write a single data point in cloudwatch
   // await cloudwatch.putMetricData({
   //   MetricData: [
   //     {
-  //       MetricName: 'MetricName', // Use different metric names for different values, e.g. 'Latency' and 'Successful'
-  //       Dimensions: [
+  //       MetricName: 'MetricName', // Use different metric names for different values, e.g. 'Latency' and 'Successful', name can be anything
+  //       Dimensions: [ // list of key value pairs that will allow to find this match on cloudwatch
   //         {
   //           Name: 'ServiceName',
   //           Value: serviceName
@@ -32,7 +32,7 @@ exports.handler = async (event) => {
   //       Value: 0 // Total value
   //     }
   //   ],
-  //   Namespace: 'Udacity/Serveless'
+  //   Namespace: 'Udacity/Serverless' // name can be anything, its name for isolated group of metricse
   // }).promise()
 
   // TODO: Record time it took to get a response
