@@ -1,3 +1,6 @@
+# there are 4 different structures
+# 1. provider 2. functions 3. plugins 4. resources
+
 service:
   name: serverless-todo-app
 
@@ -11,6 +14,8 @@ provider:
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
+  # environment:
+    # envName: tableName (EXAMPLE)
 
 functions:
 
@@ -18,15 +23,14 @@ functions:
     handler: src/lambda/auth/auth0Authorizer.handler
 
   # TODO: Configure this function
-  GetTodos:
-    handler: src/lambda/http/getTodos.handler
-    events:
+  GetTodos: # lambda func name
+    handler: src/lambda/http/getTodos.handler # specifies where func is located
+    events: # invoke the func
       - http:
-          method: get
-          path: todos
+          method: get # specifies method request
+          path: todos # to following resource
 
   # TODO: Configure this function
-  GetTodos:
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:
@@ -61,3 +65,30 @@ functions:
 resources:
   Resources:
     # TODO: Add any necessary AWS resources
+    # suggested dynamodb resource from readme
+    # TodosTable:
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     AttributeDefinitions:
+    #       - AttributeName: partitionKey
+    #         AttributeType: S
+    #       - AttributeName: sortKey
+    #         AttributeType: S
+    #       - AttributeName: indexKey
+    #         AttributeType: S
+    #     KeySchema:
+    #       - AttributeName: partitionKey
+    #         KeyType: HASH
+    #       - AttributeName: sortKey
+    #         KeyType: RANGE
+    #     BillingMode: PAY_PER_REQUEST
+    #     TableName: ${self:provider.environment.TODOS_TABLE}
+    #     LocalSecondaryIndexes:
+    #       - IndexName: ${self:provider.environment.INDEX_NAME}
+    #         KeySchema:
+    #           - AttributeName: partitionKey
+    #             KeyType: HASH
+    #           - AttributeName: indexKey
+    #             KeyType: RANGE
+    #         Projection:
+    #           ProjectionType: ALL # What attributes will be copied to an index
