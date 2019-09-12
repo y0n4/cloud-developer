@@ -11,6 +11,8 @@ const logger = createLogger('auth')
 
 const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
 
+const secret='e4nWVQw2kN1Bz2QwsfumIXo0kfZj5EFoa2PMFV9uxQhNmKBO70s7VQtvVQvjTAzv';
+
 export const handler = async (
   event: CustomAuthorizerEvent
 ): Promise<CustomAuthorizerResult> => {
@@ -58,8 +60,13 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
 
   // TODO: Implement token verification
-  // throw exception a token is invalid
-  return undefined
+
+  // const token = need token to verify
+  // const secret = used to sign this token
+
+  // if thrown error, else valid token
+  return verify(token, secret) as JwtPayload;
+  // return undefined
 }
 
 function getToken(authHeader: string): string {
