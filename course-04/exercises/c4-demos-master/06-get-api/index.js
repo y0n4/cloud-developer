@@ -15,6 +15,11 @@ const data = [
     id: '3',
     name: 'Cities',
     description: 'Creative display of urban settings',
+  },
+  {
+    id: '4',
+    name: 'Computers',
+    description: 'For the techies among us',
   }
 ]
 
