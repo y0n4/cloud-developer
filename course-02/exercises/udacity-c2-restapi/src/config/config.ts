@@ -5,7 +5,7 @@ export const config = {
     "database": "udagram",
     "host": "udagram.crks3fohnav1.us-east-1.rds.amazonaws.com",
     "dialect": "postgres",
-    "aws_reigion": "us-east-2",
+    "aws_region": "us-east-2",
     "aws_profile": "default",
     "aws_media_bucket": "udagrams3"
   },
