@@ -51,11 +51,14 @@ export const handler = async (
   }
 }
 
+// receives one parameter from client to api gateway
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
+  console.log('🌸🌸', authHeader);
   const token = getToken(authHeader)
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
 
   // TODO: Implement token verification
+  // throw exception a token is invalid
   return undefined
 }
 
