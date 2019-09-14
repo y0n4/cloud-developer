@@ -14,8 +14,12 @@ provider:
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
-  # environment:
-    # envName: tableName (EXAMPLE)
+
+  environment:
+    TODOS_TABLE: Todos-${self:provider.stage} # go to provider section and find stage variable
+    INDEX_NAME: TodoIdIndex
+    TODO_S3_BUCKET: todos-severless-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
 
 functions:
 
@@ -24,11 +28,17 @@ functions:
 
   # TODO: Configure this function
   GetTodos: # lambda func name
-    handler: src/lambda/http/getTodos.handler # specifies where func is located
+    handler: src/lambda/http/getTodos.handler # specifies path of func
     events: # invoke the func
       - http:
           method: get # specifies method request
           path: todos # to following resource
+          # cors: true # fix problems of request
+    # iamRoleStatements: # allows iam permission of what actions can be done in dynamoodb
+    #   - Effect: Allow
+    #     Action:
+    #       - dynamodb:Query # can query
+    #     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   # TODO: Configure this function
   CreateTodo:
@@ -37,6 +47,13 @@ functions:
       - http:
           method: post
           path: todos
+          # cors: true 
+    # iamRoleStatements:
+    #   - Effect: Allow
+    #     Action:
+    #       - dynamodb:PutItem # can post/create
+    #     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+
 
   # TODO: Configure this function
   UpdateTodo:
@@ -45,6 +62,13 @@ functions:
       - http:
           method: patch
           path: todos/{todoId}
+          # cors: true
+    # iamRoleStatements:
+    #   - Effect: Allow
+    #     Action:
+    #       - dynamodb:UpdateItem # can update
+    #     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+    
 
   # TODO: Configure this function
   DeleteTodo:
@@ -53,6 +77,12 @@ functions:
       - http:
           method: delete
           path: todos/{todoId}
+          # cors: true
+    # iamRoleStatements:
+    #   - Effect: Allow
+    #     Action:
+    #       - dynamodb:DeleteItem # can delete
+    #     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   # TODO: Configure this function
   GenerateUploadUrl:
@@ -61,34 +91,35 @@ functions:
       - http:
           method: post
           path: todos/{todoId}/attachment
+          # cors: true
 
 resources:
   Resources:
     # TODO: Add any necessary AWS resources
     # suggested dynamodb resource from readme
-    # TodosTable:
-    #   Type: AWS::DynamoDB::Table
-    #   Properties:
-    #     AttributeDefinitions:
-    #       - AttributeName: partitionKey
-    #         AttributeType: S
-    #       - AttributeName: sortKey
-    #         AttributeType: S
-    #       - AttributeName: indexKey
-    #         AttributeType: S
-    #     KeySchema:
-    #       - AttributeName: partitionKey
-    #         KeyType: HASH
-    #       - AttributeName: sortKey
-    #         KeyType: RANGE
-    #     BillingMode: PAY_PER_REQUEST
-    #     TableName: ${self:provider.environment.TODOS_TABLE}
-    #     LocalSecondaryIndexes:
-    #       - IndexName: ${self:provider.environment.INDEX_NAME}
-    #         KeySchema:
-    #           - AttributeName: partitionKey
-    #             KeyType: HASH
-    #           - AttributeName: indexKey
-    #             KeyType: RANGE
-    #         Projection:
-    #           ProjectionType: ALL # What attributes will be copied to an index
+    TodosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: todoId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: todoId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.TODOS_TABLE} # get value of table name at environment
+        LocalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.INDEX_NAME}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: todoId
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL # What attributes will be copied to an index
