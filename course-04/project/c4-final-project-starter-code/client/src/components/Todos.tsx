@@ -53,7 +53,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       })
       this.setState({
         todos: [...this.state.todos, newTodo],
-        newTodoName: ''
+        newTodoName: '',
       })
     } catch {
       alert('Todo creation failed')
@@ -128,6 +128,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
             fluid
             actionPosition="left"
             placeholder="To change the world..."
+            value={this.state.newTodoName}
             onChange={this.handleNameChange}
           />
         </Grid.Column>
@@ -157,6 +158,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   }
 
   renderTodosList() {
+    console.log('🌸🌸🌸', this.state.newTodoName);
     return (
       <Grid padded>
         {this.state.todos.map((todo, pos) => {
