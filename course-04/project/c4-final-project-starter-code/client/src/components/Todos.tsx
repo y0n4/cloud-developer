@@ -85,7 +85,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
         })
       })
     } catch {
-      alert('Todo deletion failed')
+      alert('Todo update failed')
     }
   }
 
@@ -158,7 +158,6 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   }
 
   renderTodosList() {
-    console.log('🌸🌸🌸', this.state.newTodoName);
     return (
       <Grid padded>
         {this.state.todos.map((todo, pos) => {
