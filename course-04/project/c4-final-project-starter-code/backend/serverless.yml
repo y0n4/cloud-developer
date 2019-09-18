@@ -63,7 +63,9 @@ functions:
       - http:
           method: post
           path: todos
-          cors: true # fix problems of request
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
     # iamRoleStatements:
     #   - Effect: Allow
     #     Action:
@@ -79,6 +81,7 @@ functions:
           method: patch
           path: todos/{todoId}
           cors: true
+          authorizer: Auth
     # iamRoleStatements:
     #   - Effect: Allow
     #     Action:
@@ -94,6 +97,7 @@ functions:
           method: delete
           path: todos/{todoId}
           cors: true
+          authorizer: Auth
     # iamRoleStatements:
     #   - Effect: Allow
     #     Action:
