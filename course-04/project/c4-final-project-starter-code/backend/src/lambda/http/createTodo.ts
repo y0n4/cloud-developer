@@ -3,6 +3,7 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 const docClient = new AWS.DynamoDB.DocumentClient()
 const todosTable = process.env.TODOS_TABLE
+const todosBucket = process.env.IMAGES_S3_BUCKET
 import * as AWS  from 'aws-sdk'
 import * as uuid from 'uuid'
 
@@ -15,7 +16,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
   console.log(newTodo);
 
-  // TODO: Implement creating a new TODO item ✅
+  // TODO: Implement creating a new TODO item
   const itemId = uuid.v4() // generate random id for TODO item
 
   // store user ID in a DynamoDB table (store user when they create a new item by calling getUserId func)
@@ -35,7 +36,9 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   // 3. store it to the DynamobDB table
   const newItem = {
     todoId: itemId,
-    userId, // Can be abbreviated to just "userId,"
+    userId,
+    done: false,
+    attachmentUrl: `https://${todosBucket}.s3.amazonaws.com/${itemId}`,
     ...newTodo
   }
 
