@@ -19,7 +19,7 @@ provider:
     TODOS_TABLE: Todos-${self:provider.stage} # go to provider section and find stage variable
     INDEX_NAME: TodoIdIndex
     TODO_S3_BUCKET: todos-severless-${self:provider.stage}
-    SIGNED_URL_EXPIRATION: 300
+    SIGNED_URL_EXPIRATION: 300 # amount of time that allows uer to use the link before it expires
 
   iamRoleStatements:
   - Effect: Allow
@@ -30,11 +30,11 @@ provider:
       - dynamodb:UpdateItem
       - dynamodb:DeleteItem
     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}   
-  # - Effect: Allow
-  #   Action:
-  #     - s3:PutObject
-  #     - s3:GetObject
-  #   Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENTS_S3_BUCKET}/*
+  - Effect: Allow
+    Action:
+      - s3:PutObject
+      - s3:GetObject
+    Resource: arn:aws:s3:::${self:provider.environment.TODO_S3_BUCKET}/*
 
 functions:
 
@@ -112,11 +112,11 @@ functions:
           method: post
           path: todos/{todoId}/attachment
           cors: true
+          authorizer: Auth
 
 resources:
   Resources:
-    # TODO: Add any necessary AWS resources
-    
+    # TODO: Add any necessary AWS resources    
     # suggested dynamodb resource from readme
     TodoDynamoDBTable:
       Type: AWS::DynamoDB::Table
@@ -145,6 +145,25 @@ resources:
             Projection:
               ProjectionType: ALL
 
+    AttachmentsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.TODO_S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+    
     RequestBodyValidator:
       Type: AWS::ApiGateway::RequestValidator
       Properties:
@@ -153,3 +172,18 @@ resources:
           Ref: ApiGatewayRestApi
         ValidateRequestBody: true
         ValidateRequestParameters: false
+
+    # allow anyone to get objects from s3 bucket (error can be ignored below)
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: MyPolicy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.TODO_S3_BUCKET}/*'
+        Bucket: !Ref AttachmentsBucket
